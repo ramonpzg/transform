@@ -41,4 +41,8 @@ Metrics vary by industry and company, but there are overlaps across both. For ex
 
 In contrast, metrics that are specific to a product, especially those with a pattent behind them, we'll be unique, and only valuable for, the company developing or using such product. For example, 
 
-As you can imagine, companies collect different amounts of data as well as little variety of it to a lot. In addition, the finance and marketing team might need to create unique metrics and share the same ones across their organization. After all, we'd like to use the finance team's revenue recipe and the marketing team's ad conversion rate recipe for any downstream application. It follows that 
+As you can imagine, companies collect different amounts and varieties of data. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across the organization. After all, we'd like to use the finance team's revenue recipe for anything sales related, and the marketing team's ad conversion multitude of recipes for any other downstream application or analysis. With that in mind, it follows that there has to be a better way to collaborate across teams and keep track of what's important to our companies, and the solution to this is what we'll cover next, Metrics Stores.
+
+## 3. Metrics Stores
+
+Think about the 
