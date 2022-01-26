@@ -1,6 +1,6 @@
 # Metrics Stores vs Feature Stores
 
-Deriving value from data, whether for consumption or further value generation within a (machine learning) system, requires care, ingenuity, and team of motivated problem solvers with a common goal. To accomplish this task within the analytical world we have, the metrics and feature stores.
+Deriving value from data, whether for consumption or further value generation within a (machine learning) system, requires care, ingenuity, and a team of motivated problem solvers with a common goal. To accomplish this task within the analytical world we have, the metrics and feature stores.
 
 ## Table of Contents
 
@@ -9,8 +9,8 @@ Deriving value from data, whether for consumption or further value generation wi
 3. Metrics Stores
 4. Features
 5. Features Stores
-6. Advantages
-7. Disadvantages
+6. Advantages and Similarities
+7. Disadvantages and Differences
 8. Why do we need Stores?
 9. When should you adopt either?
 10. What should I look for in either solution?
@@ -22,36 +22,45 @@ TL;DR
 
 ## 1. Overview (Motivating your KPIs and Movies Recommendations)
 
-An almost ubiquitous aspect of modern life is that most of us have and need a job in order to put food on the table and pay for services such as Netflix, which provide us with entertainment for our lazy Sunday fix. To get through our jobs, and be successful in our chosen careers, some of us need to achieve goals that are usually measured in terms of Key Performance Indicators (KPIs) or metrics. These KPIs might directly or indirectly affect the performance of our team, or a key metric at our company. Conversely, in order for Netflix to personalize our experience and recommend us the next movie, it needs to know some of the characteristics, or features, that make us who we are in and outside of the platform (e.g., gender, age, most watched genre, ...).
+An almost ubiquitous aspect of modern life is that most of us have and need a job to put food on the table and pay for services such as Netflix, which provide us with entertainment for our lazy Sunday fix. To get through our jobs, and be successful in our chosen careers, some of us need to achieve goals that are usually measured in terms of Key Performance Indicators (KPIs) or metrics. These KPIs might directly or indirectly affect the performance of our team, or a key parameter of the success of our company. Conversely, in order for Netflix to personalize our experience and recommend us the next movie, it needs to know some of the characteristics, or features, that make us who we are in and outside of the platform (e.g., gender, age, most watched genre, ...).
 
-The number of metrics and features needed for each, work and a custom experience, can be plenty and their complexity -- the ways in which each is generated -- has no creative ceiling. In other words, just as purchasing a carton of milk and a t-shirt could be done at their respective dairy and cotton farms, generating metrics and features could be done from their respective databases. What we need would just need to be assembled by milking the cows, sewing the cotton, and writing SQL queries. Luckily, to solve all these problems we have convenience, clothing, metrics and feature stores, and in this blog post we'll cover the latter two.
+The number of metrics and features needed for each -- work and a custom experience -- can be plenty and their complexity (i.e., the ways in which each is generated) has no creative ceiling. In other words, just as purchasing a carton of milk and a t-shirt could be done at their respective dairy and cotton farms, generating metrics and features could be done from their respective databases. What we want would just need to be assembled by milking the cows, sewing the cotton, and writing SQL queries. Luckily, to solve all these problems we have convenience, clothing, metrics and feature stores, and in this blog post we'll cover the latter two, so let's start with metrics.
 
 
 ## 2. Metrics
 
-Out of the many similarities different companies have, the most notable one is that they all have metrics they need to keep track of. After all, regardless of the product or service they may provide, "if you can not measure it, you cannot improve it."
+Out of the many similarities companies share, the most notable one is that they all have metrics they need to observe to keep track of their progress. After all, regardless of the product or service a company may provide, "if you can not measure it, you cannot improve it."
 
-A more technical definition of metrics tells us that these are quantifiable measures used to track and asses the status of a specific process at a given point in time. To put this into perspective, imagine that you are in the business of selling a nicely packaged bundle of spirits and mixers (a.k.a. a cocktail), and that you'd like to know, as precisely as possible, how many and which of these bundles improves best the financial health of your bar, e.g. pays for you bar's rent, staff's salary, overall supplies, etc. One way to figure it out would be with the metrics `revenue_per_menu_cocktail` (which contains all of the signature cocktails you have worked so hard to create) and `revenue_per_classic_cocktail` (which contains all the classics such as an old fashion, a manhattan, or a cosmopolitan, among many others).
+A more technical definition of metrics tells us that these are quantifiable measures used to track and asses the status of a specific process at a given point in time. To put this into perspective, imagine that you are in the business of selling nicely packaged bundle of spirits and mixers (a.k.a. cocktails), and that you'd like to know, as precisely as possible how many, and which of the bundles improve best the financial health of your bar, e.g. which cocktail pays for you bar's rent, staff salary, overall supplies, etc. One way to figure it out would be with the metrics `revenue_per_menu_cocktail` (which contains all of the signature cocktails you have worked so hard to create) and `revenue_per_classic_cocktail` (which contains all the classics such as an old fashion, a manhattan, or a cosmopolitan, among many others).
 
 TODO: Add picture of customer ordering a signature, another ordering a classic (old British snob ordering old fashion) and the bills and metrics on the side.
 
-These metrics, among many others, help us observe and understand how what we provide to our customers will affect the bottom line of our business. Metrics may not mean much to people outside your organization, but they represent a map we should use to help guide ourselves and our customers.
+These metrics, among others, help us observe and understand how what we provide to our customers will affect the bottom line of our business. Metrics may not mean much to people outside your organization, but they represent a map we should use to help guide vision, e.g. to be the best bar in the world.
 
-Metrics vary by industry and company, but there are overlaps across both. For example, different dating apps optimize daily active users (DAU), which is the ratio between users that logged into the app on a given day to use it, over the number of all users registered on the app. While this example is context specific, DAU is a universal metric for companies with a subscription service like Spotify (a music provider), and the NY Times (a news provider).
+Metrics vary by industry and company, but there are overlaps across both. For example, different dating apps optimize daily active users (DAU), which is the ratio between users that log into the app on a given day to use it, over the number of all users registered on the app at that point in time. While this example is context specific, DAU is a universal metric for companies with a subscription service like Spotify (a music provider) and the NY Times (a news provider). In contrast, metrics that are specific to a product, especially those with a patent behind them, will be unique and only valuable for, the company developing or using such product. For example, 
 
-In contrast, metrics that are specific to a product, especially those with a pattent behind them, we'll be unique, and only valuable for, the company developing or using such product. For example, 
-
-As you can imagine, companies collect different amounts and varieties of data. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across the organization. After all, we'd like to use the finance team's revenue recipe for anything sales related, and the marketing team's ad conversion multitude of recipes for any other downstream application or analysis. With that in mind, it follows that there has to be a better way to collaborate across teams and keep track of what's important to our companies, and the solution to this is what we'll cover next, Metrics Stores.
+As you can imagine, companies collect data in different quantities, of different variety, at different speed, etc. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across the organization. After all, we'd like to use the finance team's revenue recipe for anything sales related, and the marketing team's ad conversion recipes for any other downstream application or analysis. With that in mind, it follows that there has to be a better way to collaborate across teams and keep track of what's important to our companies, and the solution to this is what we'll cover next, the Metrics Stores.
 
 ## 3. Metrics Stores
 
-Think about the last time you went to your local supermarket, chances are, you knew the items you needed, the isle where they were located at, and the price ballpark of your bill -- unless the last time you went was at the height of COVID-19 and one of the items you were searching for was toilet paper. That said, imagine having the same consistent option but for the metrics that your company deems important? Yes, a convenience store were at the front door you would be able to see a catalog of all your metrics (including the ones on sale). A Metrics API so that if you were to connect your downstream application of choice (or order your desire piece of poultry at the deli), a quick set of specifications would do the job. A metrics framework to specify and manage your metrics once (an app were you could ask for most of the things you need before you arrived at the supermarket).
+Think about the last time you went to your local supermarket, chances are, you knew the items you needed, the isle where they were located at, and the ballpark price of your bill -- unless the last time you went was at the height of COVID-19 and one of the items you were searching for was toilet paper. With that in mind, imagine having the same consistent option but for the metrics that your company deems important? Yes, a convenient metrics supermarket were at the front door you would be able to see a catalog of all your metrics (including the ones on sale). A Metrics API so that if you were to connect your downstream application of choice (or order your desire piece of poultry at the deli), a quick set of specifications would do the job. A metrics framework to specify and manage your metrics once (an app were you could ask for most of the things you need before you arrived at the supermarket).
 
-TODO: Add drawing of stick person staring in awe at an empty shell on the isle where toilet papers used to go during covid. Don't forget the mask.
+TODO: Add drawing of stick person staring in awe at an empty shell on the isle where toilet papers used to go during COVID. Don't forget the mask.
 
-This option of a la carte metrics exists already and it works in the following way. A metrics layer gets placed in between your data and the downstream applications of your team. Teams define global and local metrics once -- usually through the combination of SQL, a metrics query language, and some YAML -- and these files are given to the metrics layer for consumption. Having these files as YAML files allows you and your team to use software engineering best practices and version control each metrics, or group of metrics, while making the process of modifying one or more a pull request, review, and repeat one.
+This option of à la carte metrics exists already and is offered by Transform, Supergrain, and GoodData. Other DIY approaches are tackled by frameworks such MetriQL, which sits on top of dbt-core), and Cube.js.
 
-Before metrics stores existed, data professionals would have to write the metrics logic for their desire data set, load it into their downstream application of choice (e.g. Tableau or Power BI), and proceed to do their analysis. In addition, this process would take place across different teams, making it prone to defining and reporting on the same metrics using different logic.
+A Metrics store works in the following way.
+1. A metrics layer is placed in between your data and the downstream applications used by your team.
+2. Teams define global and local metrics once, usually through the combination of SQL code and one or more YAML files, and these files are given to the metrics layer for consumption. 
+3. Downstream applications like Power BI, Hex, Tableau, and an environment like Jupyter Lab, can access all the metrics in the store via a Metrics Query Language API.
+
+Having the core files as YAML files allows you and your team to use software engineering best practices and version control each metrics, or group of metrics, while making the process of modifying one or more that which follows the (1) pull requests, (2) review, (3) change and (4) repeat process.
+
+In addition to being able to track each definition of a metric, once you are in a downstream tool such Mode or a Jupyter Notebook-like environment you can retrieve dataframes with your metrics of choice and begin your insights quest.
+
+Before metrics stores existed, data professionals had to write the metrics logic for their desire data set, load it into their downstream application of choice (e.g. Tableau or Power BI), and proceed to do their analysis. This metric logic was (and still is to some degree) in the form of an OLAP cube (Online Analytical Processing), which is a 
+
+In addition, this process would take place across different teams, making it prone to defining and reporting on the same metrics using different logic.
 
 ## 4. Features
 
@@ -76,7 +85,9 @@ Just as metrics stores make it easier for data professionals to look for the dat
 
 Feature stores were created to address the, among many things, the data preparation gap between batch and online predictions. The former is used to make predictions in groups and at different time intervals, while the latter worries about making predictions in as close to real-time as possible. Both approaches are extremely important but, depending on the nature of a business, online predictions may carry more weight than the batch predictions. For example, customers waiting for an Uber ride don't want to wait for hours to know how long it will take to arrive at their desire destination until an estimated time of arrival has been predicted. Similarly, movie recommendations sent to me out once a day to my email might not be as effective at keeping me on the app than live recommendations that appear as soon as I I finish a movie. So now that we have a general idea of what feature stores are, let's go into the finer details.
 
-Feature stores are "an ML-specific data system that runs data pipelines that transform raw data into feature values, stores and manages the feature data itself, and serves data consistently for training and inference purposes." A feature store allows users to define feature (yes, in a same way in which metrics stores allow users to define metrics), transform, serve, and share them, and, in some cases, monitor features for drift.
+Feature stores are "an ML-specific data system that runs data pipelines that transform raw data into feature values, stores and manages the feature data itself, and serves data consistently for training and inference purposes." A feature store allows users to define features (yes, in a similar way in which metrics stores allow users to define metrics), transform, serve, and share them, and, in some cases, monitor them for distribution drift.
+
+NB: Not all open-source options but most commercial ones, allow for distribution drift monitoring.
 
 ```mermaid
 
@@ -99,6 +110,15 @@ flowchart LR
  
 ```
 
+TODO: image of user interacting with an application, Speedy Gonzalez taking the data quickly via a REST API request to the feature store, which then gives is to the model, which then gets a predictions, and speedy returns the output to the user within 0.04 seconds.
+
+A blog post in [Feast](feast.dev) -- an open feature store library in Python -- succinctly describes the data transformation criteria of a feature store into three types of features: Batch, streaming, and on-demand.
+
+Transformations on batched data are probably the most common ones out there as this is the historical data used to train machine learning models. Here we have all the information we have collected about our users, plus any other external data we have used to improve our models. These models built on batched data can be used anywhere from providing decision-making support (where to send the next group of cops to) to providing us with a movie recommendation on Netflix.
+
+Conversely, when we talk about transformation applied on streaming data, these need not be applied on the fly (i.e. in "real time") but rather in small intervals (e.g. 5, 10, 15, 20 minutes, etc.). This differs, and often gets confused with, on-demand transformations which require very low-latency to match the speed at which users interact with an application or website. Once these features are grabbed by the feature store, they are sent via a GET request to an API with our model. If this API is expected to get (pun intended) hit very frequently with requests, it will wrapped in a container and orchestrated via something like Kubernetes or another more cloud-specific product.
+
+Without getting too deep into the weeds on the topic of serving ML models in production, the reason why the preferred way of serving a model is via an API is because if these were to be embedded into an application, every time we wanted to update the model we would have to update the application.
 
 ## 6. Advantages and Similarities
 
