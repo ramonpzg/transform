@@ -1,6 +1,6 @@
 # Metrics Stores vs Feature Stores
 
-Deriving value from data, whether for consumption or further value generation within a (machine learning) system, requires care, ingenuity, and a team of motivated problem solvers with a common goal. To accomplish this task within the analytical world we have, the metrics and feature stores.
+Deriving value from data, whether for consumption or further value generation within a (machine learning) system requires care, ingenuity, and a team of motivated problem solvers with a shared goal. To accomplish this task, to derive value from data, we have the metrics stores and the feature stores.
 
 ## Table of Contents
 
@@ -18,28 +18,56 @@ Deriving value from data, whether for consumption or further value generation wi
 
 TL;DR
 
-> "You should consider Metrics Stores and Feature Stores as part of the building blocks of your data and ML stacks when, regardless of the size of your org, you have different teams building analytical products that benefit from the same information."
+> "You should consider Metrics Stores and Feature Stores as part of the building blocks of your data and ML stacks when, regardless of the size of your org, you have different teams building analytical products that benefit from the same information in a consistent way."
 
 ## 1. Overview (Motivating your KPIs and Movies Recommendations)
 
-An almost ubiquitous aspect of modern life is that most of us have and need a job to put food on the table and pay for services such as Netflix, which provide us with entertainment for our lazy Sunday fix. To get through our jobs, and be successful in our chosen careers, some of us need to achieve goals that are usually measured in terms of Key Performance Indicators (KPIs) or metrics. These KPIs might directly or indirectly affect the performance of our team, or a key parameter of the success of our company. Conversely, in order for Netflix to personalize our experience and recommend us the next movie, it needs to know some of the characteristics, or features, that make us who we are in and outside of the platform (e.g., gender, age, most watched genre, ...).
+An almost ubiquitous aspect of modern life is that most of us have and need a job to put food on the table and pay for services such as Netflix, which provide us with entertainment for our lazy Sunday fix. To get through our jobs, and be successful in our chosen careers, some of us need to achieve goals that are usually measured in terms of Key Performance Indicators (KPIs) or metrics. These KPIs might directly or indirectly affect the performance of our team, or a key parameter of the success of our company. On the other hand, for Netflix to personalize our experience on those lazy Sundays, and recommend us the next best movie, it needs to know some of the characteristics, or features, that make us who we are in and outside of the platform (e.g., gender, age, most watched genre, ...). You could say that some aggregation of us and others similar to us, are part of Netflix's KPIs.
 
 The number of metrics and features needed for each -- work and a custom experience -- can be plenty and their complexity (i.e., the ways in which each is generated) has no creative ceiling. In other words, just as purchasing a carton of milk and a t-shirt could be done at their respective dairy and cotton farms, generating metrics and features could be done from their respective databases. What we want would just need to be assembled by milking the cows, sewing the cotton, and writing SQL queries. Luckily, to solve all these problems we have convenience, clothing, metrics and feature stores, and in this blog post we'll cover the latter two, so let's start with metrics.
 
 
 ## 2. Metrics
 
-Out of the many similarities companies share, the most notable one is that they all have metrics they need to observe to keep track of their progress. After all, regardless of the product or service a company may provide, "if you can not measure it, you cannot improve it."
+Out of the many similarities companies share, the most notable one is that they all have metrics they need to track to observe the overall progress of their organizations. After all, regardless of the product or service a company may provide, "if you can not measure it, you cannot improve it."
 
-A more technical definition of metrics tells us that these are quantifiable measures used to track and asses the status of a specific process at a given point in time. To put this into perspective, imagine that you are in the business of selling nicely packaged bundle of spirits and mixers (a.k.a. cocktails), and that you'd like to know, as precisely as possible how many, and which of the bundles improve best the financial health of your bar, e.g. which cocktail pays for you bar's rent, staff salary, overall supplies, etc. One way to figure it out would be with the metrics `revenue_per_menu_cocktail` (which contains all of the signature cocktails you have worked so hard to create) and `revenue_per_classic_cocktail` (which contains all the classics such as an old fashion, a manhattan, or a cosmopolitan, among many others).
+A more technical definition of metrics tells us that these are *quantifiable measures used to track and asses the status of a specific process at a given point in time*. To put this into perspective, imagine that you are in the business of selling nicely packaged bundle of spirits and mixers (a.k.a. you own a bar), and that you'd like to know as precisely as possible how many, and which of the drinks you sell, improves best the financial health of your bar, e.g. whether cocktails or beers pay best for you bar's rent, staff salary, overall supplies, etc. One way to figure this out would be with the metrics `revenue_per_menu_cocktail` (which contains all of the signature cocktails you have worked so hard to create) and `revenue_per_classic_drink` (which may contain beers or some of the classics such as an old fashion, a manhattan, or a cosmopolitan).
 
-TODO: Add picture of customer ordering a signature, another ordering a classic (old British snob ordering old fashion) and the bills and metrics on the side.
+![bar](../images/bar-metrics.jpg)
 
-These metrics, among others, help us observe and understand how what we provide to our customers will affect the bottom line of our business. Metrics may not mean much to people outside your organization, but they represent a map we should use to help guide vision, e.g. to be the best bar in the world.
+These metrics would help us observe and understand how what we provide to our customers will affect the bottom line of our business. Metrics may not mean much to people outside our bar, but they represent a map we should use to help guide one or more goals, e.g. to be the best bar in the world. To illustrate how these metrics get created, assume all transactions get placed into the following table.
 
-Metrics vary by industry and company, but there are overlaps across both. For example, different dating apps optimize daily active users (DAU), which is the ratio between users that log into the app on a given day to use it, over the number of all users registered on the app at that point in time. While this example is context specific, DAU is a universal metric for companies with a subscription service like Spotify (a music provider) and the NY Times (a news provider). In contrast, metrics that are specific to a product, especially those with a patent behind them, will be unique and only valuable for, the company developing or using such product. For example, 
+| Idx | Item (S=Signature)       |Price|    Date   |Quantity|Signature|
+|:---:|:------------------------:|:---:|:---------:|-------:|:-------:|
+|  0  | Old Fashion              |  17 | 03-Jan-22 |    2   |    0    |
+|  1  | Shiny Palace (S)         |  24 | 03-Jan-22 |    4   |    1    |
+|  2  | Multi-vodkaTini (S)      |  23 | 03-Jan-22 |    1   |    1    |
+|  3  | Pale Ale                 |   7 | 03-Jan-22 |    3   |    0    |
+|  4  | Lager                    |   6 | 04-Jan-22 |    3   |    0    |
+|  5  | Crazy Tiki Tower (S)     |  28 | 04-Jan-22 |    2   |    1    |
+|  6  | Bananalicious Martini (S)|  25 | 04-Jan-22 |    1   |    1    |
+|  7  | Aperol Spritz            |  15 | 04-Jan-22 |    2   |    0    |
+|  8  | Caribbean Sugarum (S)    |  25 | 05-Jan-22 |    2   |    1    |
+|  9  | Watermelicious (S)       |  25 | 05-Jan-22 |    1   |    1    |
+| 10  | Manhattan                |  17 | 05-Jan-22 |    3   |    0    |
+| 10  | Brown Ale                |  15 | 05-Jan-22 |    2   |    0    |
 
-As you can imagine, companies collect data in different quantities, of different variety, at different speed, etc. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across the organization. After all, we'd like to use the finance team's revenue recipe for anything sales related, and the marketing team's ad conversion recipes for any other downstream application or analysis. With that in mind, it follows that there has to be a better way to collaborate across teams and keep track of what's important to our companies, and the solution to this is what we'll cover next, the Metrics Stores.
+When we think of metrics we think of aggregated results by different dimensions. In this instance, a dimension is the same as a column in the table above and a measure to aggregate by is usually a time dimension. 
+
+| Idx | day_of_year |Price| Date |Quantity| Is Signature |
+|:---:|:-----------:|:---:|:--------:|-------:|:----:|
+|  0  |    Day 1    | 17 | 03-Jan-22 |    739 |  0 |
+|  1  |    Day 1    | 24 | 03-Jan-22 |    739 |  1 |
+|  2  |    Day 2    | 23 | 03-Jan-22 |    739 |  1 |
+|  3  |    Day 2    | 17 | 03-Jan-22 |    739 |  0 |
+|  4  |    Day 3    | 24 | 03-Jan-22 |    739 |  1 |
+|  5  |    Day 3    | 23 | 03-Jan-22 |    739 |  1 |
+
+
+
+Metrics vary by industry and company, but there are overlaps across both. For example, different dating apps optimize daily active users (DAU), which is the ratio between users that log into the app on a given day, over the number of all users registered on the app at that point in time. While this example is context specific, DAU is a universal metric for companies with a subscription service like Spotify (a music provider) and the NY Times (a news provider). In contrast, metrics that are specific to a product, especially those with a patent behind them will be unique and valuable for, the company developing or using such product. For example, the gaming industry is notorious for its patent applications and, as such, some of their metrics range from complex marketplaces within games using real currency to new video rendering systems that increase the quality of the game.
+
+As you can imagine, all these metrics require data and companies collect it in different variety, with distinct velocity, veracity, and validity. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across the organization. After all, if we wanted to create a report based on the metrics from these two teams, we'd like to use the finance's team revenue recipe, and the marketing's team ad conversion recipes rather than one curated by anyone else in the company. Beyond acquiring such metrics, we would use downstream applications for analysis. With that in mind, it follows that there has to be a better way to collaborate across teams and keep track of what's important to our companies, and the solution to this is what we'll cover next, the Metrics Stores.
 
 ## 3. Metrics Stores
 
