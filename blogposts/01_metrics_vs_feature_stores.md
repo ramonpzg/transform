@@ -22,7 +22,7 @@ TL;DR
 
 ## 1. Overview (Motivating your KPIs and Movies Recommendations)
 
-An almost ubiquitous aspect of modern life is that most of us have and need a job to put food on the table and pay for services such as Netflix, which provide us with entertainment for our lazy Sunday fix. To get through our jobs, and be successful in our chosen careers, some of us need to achieve goals that are usually measured in terms of Key Performance Indicators (KPIs) or metrics. These KPIs might directly or indirectly affect the performance of our team, or a key parameter of the success of our company. On the other hand, for Netflix to personalize our experience on those lazy Sundays, and recommend us the next best movie, it needs to know some of the characteristics, or features, that make us who we are in and outside of the platform (e.g., gender, age, most watched genre, ...). You could say that some aggregation of us and others similar to us, are part of Netflix's KPIs.
+An almost ubiquitous aspect of modern life is that most of us have and need a job to put food on the table and pay for services such as Netflix, which provide us with entertainment for our lazy Sunday fix. To get through our jobs, and be successful in our chosen careers, some of us need to achieve goals that are usually measured in terms of Key Performance Indicators (KPIs) or metrics. These KPIs might directly or indirectly affect the performance of our team or a key parameter of the success of our company. On the other hand, for Netflix to personalize our experience on those lazy Sundays, and recommend us the next best movie, it needs to know some of the characteristics, or features, that make us who we are in and outside of the platform (e.g., gender, age, most-watched genre, ...). You could say that some aggregation of us and others similar to us are part of Netflix's KPIs.
 
 The number of metrics and features needed for each -- work and a custom experience -- can be plenty and their complexity (i.e., the ways in which each is generated) has no creative ceiling. In other words, just as purchasing a carton of milk and a t-shirt could be done at their respective dairy and cotton farms, generating metrics and features could be done from their respective databases. What we want would just need to be assembled by milking the cows, sewing the cotton, and writing SQL queries. Luckily, to solve all these problems we have convenience, clothing, metrics and feature stores, and in this blog post we'll cover the latter two, so let's start with metrics.
 
@@ -31,11 +31,11 @@ The number of metrics and features needed for each -- work and a custom experien
 
 Out of the many similarities companies share, the most notable one is that they all have metrics they need to track to observe the overall progress of their organizations. After all, regardless of the product or service a company may provide, "if you can not measure it, you cannot improve it."
 
-A more technical definition of metrics tells us that these are *quantifiable measures used to track and asses the status of a specific process at a given point in time*. To put this into perspective, imagine that you are in the business of selling nicely packaged bundle of spirits and mixers (a.k.a. you own a bar), and that you'd like to know as precisely as possible how many, and which of the drinks you sell, improves best the financial health of your bar, e.g. whether cocktails or beers pay best for you bar's rent, staff salary, overall supplies, etc. One way to figure this out would be with the metrics `revenue_per_menu_cocktail` (which contains all of the signature cocktails you have worked so hard to create) and `revenue_per_classic_drink` (which may contain beers or some of the classics such as an old fashion, a manhattan, or a cosmopolitan).
+A more technical definition of metrics tells us that these are *quantifiable measures used to track and assess the status of a specific process at a given point in time*. To put this into perspective, imagine that you are in the business of selling a nicely packaged bundle of spirits with mixers (a.k.a. you own a bar and sell, well, cocktails), and that you'd like to know, as precisely as possible, how many and which cocktails or beers give you the most financial return for you to pay for you establishment's rent, staff salary, overall supplies, etc. One way to figure this out would be by calculating the metrics `revenue_per_signature_cocktail` (which contains all of the signature cocktails you have worked so hard to create) and `revenue_per_classic_drink` (which may contain beers or some of the classics such as an old fashion, a Manhattan, or a cosmopolitan, among others).
 
 ![bar](../images/bar-metrics.jpg)
 
-These metrics would help us observe and understand how what we provide to our customers will affect the bottom line of our business. Metrics may not mean much to people outside our bar, but they represent a map we should use to help guide one or more goals, e.g. to be the best bar in the world. To illustrate how these metrics get created, assume all transactions get placed into the following table.
+These metrics would help us observe and understand how what we provide to our customers will affect the bottom line of our business. Metrics may not mean much to people outside our bar, but they represent a map we should use to help guide us towards one or more goals, e.g. to be the best bar in the world. To illustrate how these metrics get created, assume all of your transactions get placed into a table such as the following one.
 
 | Idx | Item (S=Signature)       |Price|    Date   |Quantity|Signature|
 |:---:|:------------------------:|:---:|:---------:|-------:|:-------:|
@@ -48,64 +48,58 @@ These metrics would help us observe and understand how what we provide to our cu
 |  6  | Bananalicious Martini (S)|  25 | 04-Jan-22 |    1   |    1    |
 |  7  | Aperol Spritz            |  15 | 04-Jan-22 |    2   |    0    |
 |  8  | Caribbean Sugarum (S)    |  25 | 05-Jan-22 |    2   |    1    |
-|  9  | Watermelicious (S)       |  25 | 05-Jan-22 |    1   |    1    |
+|  9  | Watermelicious (S)       |  28 | 05-Jan-22 |    1   |    1    |
 | 10  | Manhattan                |  17 | 05-Jan-22 |    3   |    0    |
-| 10  | Brown Ale                |  15 | 05-Jan-22 |    2   |    0    |
+| 11  | Brown Ale                |   7 | 05-Jan-22 |    4   |    0    |
 
-When we think of metrics we think of aggregated results by different dimensions. In this instance, a dimension is the same as a column in the table above and a measure to aggregate by is usually a time dimension. 
+When we think of metrics we think of aggregated results by different dimensions. In this instance, a dimension is the same as a column in the table above and a measure to aggregate a dimension by usually involved time. For example, tracking the average revenue made, the emails sent out for ad campaigns, the churn experienced, and others, only (or mostly) make sense from a trend perspective. This means that we want to see the sums, averages, and the like by the minute, hour, day, week, or any other value to reason about their change from X point in the past to today. That said, the previously afforemetioned metrics would look  as follows after being calculated (we'll talk about the computation process in the next section).
 
-| Idx | day_of_year |Price| Date |Quantity| Is Signature |
-|:---:|:-----------:|:---:|:--------:|-------:|:----:|
-|  0  |    Day 1    | 17 | 03-Jan-22 |    739 |  0 |
-|  1  |    Day 1    | 24 | 03-Jan-22 |    739 |  1 |
-|  2  |    Day 2    | 23 | 03-Jan-22 |    739 |  1 |
-|  3  |    Day 2    | 17 | 03-Jan-22 |    739 |  0 |
-|  4  |    Day 3    | 24 | 03-Jan-22 |    739 |  1 |
-|  5  |    Day 3    | 23 | 03-Jan-22 |    739 |  1 |
+| day_of_year | revenue_per_classic_drink | revenue_per_signature_cocktail |
+|:-----------:|:---:|:--------:|
+|  Day 3    | 55 | 119 |
+|  Day 4    | 48 | 81 |
+|  Day 5    | 81 | 50 |
 
+In addition to those in bars and restaurants, metrics vary by industry and company, but there are overlaps across both. For example, different dating apps optimize daily active users (DAU), which is the ratio between users that log into the app on a given day, over the number of all users registered on the app at that point in time. While this example may seem very context specific, DAU is a universal metric for companies with a subscription service like Spotify (a music provider) and the NY Times (a news provider). In contrast, metrics that are specific to a product, especially those with a patent behind them, will be unique and valuable for the company developing or using such a product. For example, the gaming industry is notorious for its patent applications and, as such, some of their metrics range from complex marketplaces using real currency within games to new video rendering systems that increase the quality of a game.
 
-
-Metrics vary by industry and company, but there are overlaps across both. For example, different dating apps optimize daily active users (DAU), which is the ratio between users that log into the app on a given day, over the number of all users registered on the app at that point in time. While this example is context specific, DAU is a universal metric for companies with a subscription service like Spotify (a music provider) and the NY Times (a news provider). In contrast, metrics that are specific to a product, especially those with a patent behind them will be unique and valuable for, the company developing or using such product. For example, the gaming industry is notorious for its patent applications and, as such, some of their metrics range from complex marketplaces within games using real currency to new video rendering systems that increase the quality of the game.
-
-As you can imagine, all these metrics require data and companies collect it in different variety, with distinct velocity, veracity, and validity. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across the organization. After all, if we wanted to create a report based on the metrics from these two teams, we'd like to use the finance's team revenue recipe, and the marketing's team ad conversion recipes rather than one curated by anyone else in the company. Beyond acquiring such metrics, we would use downstream applications for analysis. With that in mind, it follows that there has to be a better way to collaborate across teams and keep track of what's important to our companies, and the solution to this is what we'll cover next, the Metrics Stores.
+As you can imagine, all these metrics require data and companies collect it in different varieties, with distinct velocity, veracity, and validity. Moreover, different departments such as finance and marketing might need to create unique metrics or share similar ones across an organization in any industry. After all, if we wanted to create a report based on the metrics from these two teams, we'd like to use the finance's team revenue recipe, and the marketing's team ad conversion recipes rather than one curated by anyone else in the company. Beyond acquiring such metrics, we would use downstream applications for analysis to enable better decision-making processes. With this in mind, it follows that there has to be a good way to collaborate across teams and keep track of what's important to our companies, and that solution is what we'll cover next, the Metrics Stores.
 
 ## 3. Metrics Stores
 
-Think about the last time you went to your local supermarket, chances are, you knew the items you needed, the isle where they were located at, and the ballpark price of your bill -- unless the last time you went was at the height of COVID-19 and one of the items you were searching for was toilet paper. With that in mind, imagine having the same consistent option but for the metrics that your company deems important? Yes, a convenient metrics supermarket were at the front door you would be able to see a catalog of all your metrics (including the ones on sale). A Metrics API so that if you were to connect your downstream application of choice (or order your desire piece of poultry at the deli), a quick set of specifications would do the job. A metrics framework to specify and manage your metrics once (an app were you could ask for most of the things you need before you arrived at the supermarket).
+Think about the last time you went to your local supermarket, chances are, you knew the items you needed, the isle where they were located at, and the ballpark price of your bill -- unless we go back to the height of COVID-19, where we would take what we could get. With that in mind, having a metrics store at your organization is like having a supermarket right next to where you live, it's a convenient place (and at a great location) to get the essentials and more. So you can think of a metrics store as a supermarket of information, where as soon as you walk in you can see a catalog of your metrics, callable by a convenient API and with an intuitive interface to create new ones, update old ones, and delete non-useful ones.
 
-TODO: Add drawing of stick person staring in awe at an empty shell on the isle where toilet papers used to go during COVID. Don't forget the mask.
+**TODO: Add drawing of stick person staring in awe at an empty shell on the isle where toilet papers used to go during COVID, and another staring at an isle full of metrics to pick and choose from. Don't forget the mask.**
 
-This option of à la carte metrics exists already and is offered by Transform, Supergrain, and GoodData. Other DIY approaches are tackled by frameworks such MetriQL, which sits on top of dbt-core), and Cube.js.
+In essence, a metrics store contains three important components to provide a robust analytics framework: A metrics framework, a metrics API, and a metrics catalog. These get combine into a solution that becomes,
+1. a metrics layer in between your data and the downstream applications used by your team where,
+2. anyone can define global and local metrics once, usually through the combination of SQL and YAML files, and these files are given to the metrics layer for consumption. After your company's metrics are stored,
+3. downstream applications like Power BI, Hex, Tableau, and an environment like Jupyter Lab, can access all the metrics in the store via a Metrics Query Language API.
 
-A Metrics store works in the following way.
-1. A metrics layer is placed in between your data and the downstream applications used by your team.
-2. Teams define global and local metrics once, usually through the combination of SQL code and one or more YAML files, and these files are given to the metrics layer for consumption. 
-3. Downstream applications like Power BI, Hex, Tableau, and an environment like Jupyter Lab, can access all the metrics in the store via a Metrics Query Language API.
+Having the core files as YAML files allows you and your team to use software engineering best practices to version control each metric, or group of metrics, while making the process of modifying one or more that which follows the (1) edit, (2) submit a pull requests, (3) review it, (4) approve, and (5) repeat process.
 
-Having the core files as YAML files allows you and your team to use software engineering best practices and version control each metrics, or group of metrics, while making the process of modifying one or more that which follows the (1) pull requests, (2) review, (3) change and (4) repeat process.
+In addition to being able to track different metric definitions, once you are in a downstream tool such as Mode or a Jupyter Notebook-like environment, you can retrieve any of your metrics in iterative fashion for analysis and begin your insights quest.
 
-In addition to being able to track each definition of a metric, once you are in a downstream tool such Mode or a Jupyter Notebook-like environment you can retrieve dataframes with your metrics of choice and begin your insights quest.
+Before metrics stores existed, data professionals had to write the metrics logic for their desire aggregations, load the data into their downstream application of choice (e.g. Tableau or Power BI), and only then proceed to do their analysis. This metric logic was (and still is, to some degree) an operation to return a table-like object called, an OLAP cube (Online Analytical Processing). You can think of these cubes as the culmination of a `groupby` query in SQL or `pivot_table` operation using Python's beloved pandas library. In the tables returned by the latter function, the values represent your measures of interest (e.g. sales) and the columns and rows the dimensions (e.g., year, and type of customer) you aggregated the values by. Usually, these dimensions are categories and/or a time value.
 
-Before metrics stores existed, data professionals had to write the metrics logic for their desire data set, load it into their downstream application of choice (e.g. Tableau or Power BI), and proceed to do their analysis. This metric logic was (and still is to some degree) in the form of an OLAP cube (Online Analytical Processing), which is a 
+These OLAP cubes can be quite large and, most-likely, will only represent a portion of your data as aggregations, by definition, take away your ability to interrogate the data on a row-by-row, person-by-person, transaction-by-transaction, etc., basis. This process of creating OLAP cubes can be quite repetitive and error-prone as it used to be a necessary step before extracting the data from one (or many) potentially large tables. So you can probably begin to pair the solution provided by a **metrics framework** with the problem of having to continuously creating OLAP cubes before any analysis takes place, or the  benefits of having a convenient **metrics catalog** ready for retrieval via a convenient **API**. These three core features offered by a metrics store are solutions one should look once our organizations are ready to take metrics seriously and at scale.
 
-In addition, this process would take place across different teams, making it prone to defining and reporting on the same metrics using different logic.
+There are several option of à la carte metrics stores that exist already such as the SaaS options offered by Transform, Supergrain, and GoodData, as well as other DIY approaches are tackled by frameworks such MetriQL, which sits on top of dbt-core), and Cube.js. If you know of the modern data stack you might be tempted to think of the functionality of dbt as that of a metrics store and, in effect, there are some similarities between the two but dbt is not (at least right now) a complete replacement of a metrics store but rather a compliment of one.
 
 ## 4. Features
 
-Features are numerical representations of raw data and they are used to train machine learning models. Notice that the word **numerical** holds a lot of weight as features without the appropriate representation (e.g. hot and cold versus 1 and 0, respectively), will not be of any use to a model. In other words, a feature refers to a column in a tabular-like dataset. Let's recap the machine learning workflow.
+Features are numerical representations of raw data, and they are used to train machine learning models as well as to create business metrics. Notice that the word **numerical** here is very important as features without the appropriate representation (e.g. hot and cold versus 1 and 0, respectively), will not be of use to a machine learning model. You can think of features as columns in a tabular dataset holding information that we can add together, subtract, or do other mathematical operations with. Let's examine the machine learning workflow in the following image to see where and how features are used.
 
-TODO: Drawing of the machine learning cycle.
+**TODO: Drawing of the machine learning cycle (see image below for an example).**
 
-In the image above you can see that a machine learning project starts with a problem that can be solved with data. These data may require some preparation before we get to use it to train a model, and once we have such model, we go through an evaluate-fine-tune-train loop to maximize performance. Once we are done with our model, we deploy it and monitor the predictions it makes. This cycle of producing an ML model is enabled by features and, sometimes, a process called feature engineering.
+![data-science-workflow](../images/ds-workflow.png)
 
-TODO: Drawing of a carpenter or architect putting together the features of a building, house, office or anything.
+In the image above you can see that a machine learning project starts with a problem that can be solved with data which contains information in the form of feature (predictive values) and labels (what we want to predict). The data might come from different sources and it will most-likely require some preparation before we get to use it to train a model. Once we have a trained model, we would go through an experimentation stage to evaluate it and fine-tune it to maximize our ML gains. Once we are done with our model, we deploy it and monitor the predictions it makes. This cycle of producing an ML model is enabled by the features we use as well as the ones we engineer ourselves via a process called, feature engineering.
 
-Feature engineering "is the process of formulating the most appropriate features given the data, the model, and the task." Formulating these new features help us extract information from rich pieces of data such as dates (e.g. 12-Jan-2022 14:20:17) and locations (e.g. 123 Startup St, San Francisco, CA 02022, USA). Conversely, it also helps us compress multiple variables with similar information into less variables that would take away redundant features and noise out of the modeling stage.
+**TODO: Drawing of a carpenter or architect putting together the features of a building, house, office or anything.**
 
-Now that we just had a refresher of the ML life cycle, what features are, and why feature engineering is important, the next logical question would be: how do these work in live environments where users may lack the patience for models the data to be transformed and processed while providing a prediction?
+Feature engineering "*is the process of formulating the most appropriate features given the data, the model, and the task*."<sup>1</sup> Formulating new features help us extract information from rich pieces of data such as dates (e.g. 12-Jan-2022 14:20:17) and locations (e.g. 123 Startup St, San Francisco, CA 02022, USA), among many others. Conversely, feature engineering also helps us compress multiple variables with similar information into less variables, which in turn helps get rid of redundancy and noise in the data.
 
-We will look at the answer to this question in the following section.
-
+Careful selection of features to use directly in a model or to be engineered with others, can drastically affect the performance of a machine learning model. Hence, getting this step of the process right might be considered by many companies, if not all, that use ML, the most important one in their pipelines. That said, to get this process of selecting old, and engineering new features right, the feature store was born.
 
 ## 5. Features Stores
 
@@ -207,3 +201,7 @@ Metrics allow us to track what matters for our organizations while features are 
 Lastly, if you need consistency, scalability, reusability, and any other x-ability to boost the performance of your data-driven decision process as well as your ML operations, then you might want to think about adopting one or both of these stores.
 
 > Metrics Stores and Feature Stores are like the maestro/conductor of an orchestra, while the muscisians can still perform without one, you can only hope for good synchronization.
+
+
+## References
+[1] - *Feature Engineering for Machine Learning* by Alice Zheng and Amanda Casari
